@@ -1803,9 +1803,15 @@ body{
     text-align: center;
     margin-top: 20px;
   }
-  </style>
+  
+.pausado * {
+  -webkit-animation-play-state: paused !important;
+  animation-play-state: paused !important;
+}
+
+</style>
 </head>
-<body class="container">
+<body class="pausado" class="container">
 
 <!--
 <audio id="audio" autoplay loop>
@@ -2150,6 +2156,35 @@ function iniciar() {
   document.getElementById("animacion-contenedor").style.display = "block";
   document.getElementById("mensaje-personal").innerText = nombre + " TKM\natte: Carlos :)";
   document.getElementById("audio").play();
+}
+</script>
+
+
+<script>
+function iniciar() {
+  const nombre = document.getElementById("nombre").value.trim();
+  if (!nombre) {
+    alert("Por favor, escribe tu nombre.");
+    return;
+  }
+
+  // Ocultar pantalla de entrada si existe
+  if (document.getElementById("entrada-nombre")) {
+    document.getElementById("entrada-nombre").style.display = "none";
+  }
+
+  // Mostrar mensaje
+  if (document.getElementById("mensaje-personal")) {
+    document.getElementById("mensaje-personal").innerText = nombre + " TKM\natte: Carlos :)";
+  }
+
+  // Reproducir canción
+  if (document.getElementById("audio")) {
+    document.getElementById("audio").play();
+  }
+
+  // Quitar pausa de animaciones
+  document.body.classList.remove("pausado");
 }
 </script>
 
