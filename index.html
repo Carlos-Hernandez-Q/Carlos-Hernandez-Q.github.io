@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Árbol 3D con Nieve</title>
+<title>Árbol 3D RGB</title>
 
 <style>
 body {
@@ -11,29 +11,27 @@ body {
     height: 100vh;
     font-family: Arial, sans-serif;
     color: white;
-    display: flex;
-    flex-direction: column;
-}
-
-
-/* ================= ESCENA ================= */
-.scene {
-    flex: 1;
-    position: relative;
-    perspective: 1200px;
     overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;   /* ← CLAVE */
 }
 
-/* ================= ÁRBOL ================= */
-.tree {
+/* ESCENA */
+.scene {
+    width: 100%;
+    height: 100%;
+    perspective: 1400px;
     position: relative;
+    overflow: hidden;
+}
+
+/* ÁRBOL */
+.tree {
+    position: absolute;
+    top: 50%;
+    left: 50%;
     transform-style: preserve-3d;
 }
 
-/* ================= LUCES ================= */
+/* LUCES */
 .light {
     position: absolute;
     width: 7px;
@@ -41,12 +39,9 @@ body {
     border-radius: 50%;
     opacity: 0.25;
 }
+.light.on { opacity: 1; }
 
-.light.on {
-    opacity: 1;
-}
-
-/* ================= ESTRELLA ================= */
+/* ESTRELLA */
 .star {
     position: absolute;
     width: 48px;
@@ -55,99 +50,24 @@ body {
     z-index: 5;
 }
 
-/* ================= NIEVE ================= */
+/* NIEVE */
 .snow {
     position: absolute;
     width: 4px;
     height: 4px;
     background: white;
     border-radius: 50%;
-    opacity: 0.8;
+    opacity: 0.85;
     pointer-events: none;
-}
-
-/* ================= PANEL ================= */
-.panel {
-    background: #0b0b0b;
-    padding: 12px;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 10px;
-}
-
-.control {
-    background: #111;
-    padding: 6px 8px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-}
-
-.control span {
-    font-size: 11px;
-    color: #aaa;
-    width: 70px;
-}
-
-.control input,
-.control select {
-    flex: 1;
-}
-
-.btn {
-    grid-column: 1 / -1;
-    padding: 10px;
-    background: #222;
-    color: #ffd700;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
 }
 </style>
 </head>
 
 <body>
 
-<!-- ================= ESCENA ================= -->
 <div class="scene" id="scene">
     <div class="tree" id="tree"></div>
     <img src="star.png" class="star" id="star">
-</div>
-
-<!-- ================= PANEL ================= -->
-<div class="panel">
-
-    <div class="control">
-        <span>Rotar</span>
-        <input type="range" min="0" max="360" value="0" id="rot">
-    </div>
-
-    <div class="control">
-        <span>Tamaño</span>
-        <input type="range" min="300" max="600" value="480" id="size">
-    </div>
-
-    <div class="control">
-        <span>Velocidad</span>
-        <input type="range" min="50" max="400" value="120" id="speed">
-    </div>
-
-    <div class="control">
-        <span>Modo</span>
-        <select id="colorMode">
-            <option value="rgb">RGB</option>
-            <option value="fixed">Fijo</option>
-            <option value="classic">Clásico</option>
-        </select>
-    </div>
-
-    <div class="control">
-        <span>Color</span>
-        <input type="color" value="#ff0000" id="colorPicker">
-    </div>
-
-    <button class="btn" id="toggle">ENCENDIDAS</button>
-
 </div>
 
 <script>
@@ -155,54 +75,50 @@ const scene = document.getElementById("scene");
 const tree = document.getElementById("tree");
 const star = document.getElementById("star");
 
-const rot = document.getElementById("rot");
-const size = document.getElementById("size");
-const speed = document.getElementById("speed");
-const toggleBtn = document.getElementById("toggle");
-const colorMode = document.getElementById("colorMode");
-const colorPicker = document.getElementById("colorPicker");
-
-let lights = [];
-let snowflakes = [];
-let encendido = true;
-let nivel = 0;
+/* ================== CONFIG ================== */
+let scale = 1.2;          // tamaño inicial grande
+let rotY = 0;
+let rotX = -18;
 let hueOffset = 0;
 
-/* ========== CREAR ÁRBOL ========== */
+/* ================== ÁRBOL ================== */
+let lights = [];
+const ALTURA = 520;
+const TOTAL_LUCES = 460;
+
 function crearArbol() {
     tree.innerHTML = "";
     lights = [];
 
-    const altura = size.value;
-    const totalLuces = 420;
+    for (let i = 0; i < TOTAL_LUCES; i++) {
+        const l = document.createElement("div");
+        l.className = "light";
 
-    for (let i = 0; i < totalLuces; i++) {
-        const luz = document.createElement("div");
-        luz.className = "light";
+        const y = (i / TOTAL_LUCES) * ALTURA;
+        const r = (ALTURA - y) / 2.6;
+        const a = i * 0.32;
 
-        const y = (i / totalLuces) * altura;
-        const radio = (altura - y) / 2.8;
-        const angulo = i * 0.32;
+        const x = Math.cos(a) * r;
+        const z = Math.sin(a) * r;
 
-        const x = Math.cos(angulo) * radio;
-        const z = Math.sin(angulo) * radio;
+        l.dataset.y = ALTURA - y;
 
-        luz.dataset.y = altura - y;
-
-        luz.style.transform = `
-            translate3d(${x}px, ${altura - y}px, ${z}px)
+        l.style.transform = `
+            translate3d(${x}px, ${ALTURA - y}px, ${z}px)
         `;
 
-        tree.appendChild(luz);
-        lights.push(luz);
+        tree.appendChild(l);
+        lights.push(l);
     }
 }
 
 crearArbol();
 
-/* ========== NIEVE ========== */
+/* ================== NIEVE ================== */
+let snowflakes = [];
+
 function crearNieve() {
-    for (let i = 0; i < 160; i++) {
+    for (let i = 0; i < 180; i++) {
         const s = document.createElement("div");
         s.className = "snow";
         resetSnow(s);
@@ -212,77 +128,89 @@ function crearNieve() {
 }
 
 function resetSnow(s) {
-    s.style.left = Math.random() * scene.clientWidth + "px";
+    s.style.left = Math.random() * window.innerWidth + "px";
     s.style.top = -10 + "px";
-    s.dataset.speed = 1 + Math.random() * 2.5;
+    s.dataset.speed = 1.5 + Math.random() * 3;
 }
 
 crearNieve();
 
-/* ========== LUCES SUBEN ========== */
-let timer = setInterval(animarLuces, speed.value);
+/* ================== TOUCH / MOUSE ================== */
+let dragging = false;
+let lastX = 0;
+let lastDist = 0;
 
-function animarLuces() {
-    if (!encendido) return;
+scene.addEventListener("pointerdown", e => {
+    dragging = true;
+    lastX = e.clientX;
+});
+scene.addEventListener("pointerup", () => dragging = false);
+scene.addEventListener("pointermove", e => {
+    if (!dragging) return;
+    rotY += (e.clientX - lastX) * 0.3;
+    lastX = e.clientX;
+});
 
-    lights.forEach(l => {
-        const y = parseFloat(l.dataset.y);
-        l.classList.toggle("on", y < nivel);
-    });
+// Zoom con rueda (PC)
+scene.addEventListener("wheel", e => {
+    scale += e.deltaY * -0.001;
+    scale = Math.min(Math.max(scale, 0.6), 2.5);
+});
 
-    nivel += 12;
-    if (nivel > size.value) nivel = 0;
-}
+// Pinch (touch)
+scene.addEventListener("touchmove", e => {
+    if (e.touches.length === 2) {
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
 
-/* ========== UPDATE GENERAL ========== */
-function update() {
+        if (lastDist) {
+            scale += (dist - lastDist) * 0.002;
+            scale = Math.min(Math.max(scale, 0.6), 2.5);
+        }
+        lastDist = dist;
+    }
+});
+scene.addEventListener("touchend", () => lastDist = 0);
+
+/* ================== LOOP ================== */
+function loop() {
+
     tree.style.transform = `
-        translateY(-${size.value / 2}px)
-        rotateX(-18deg)
-        rotateY(${rot.value}deg)
+        translate3d(-50%, -50%, 0)
+        scale(${scale})
+        rotateX(${rotX}deg)
+        rotateY(${rotY}deg)
     `;
 
     star.style.transform = `
-        translate3d(0px, -${size.value / 2 - 10}px, 0px)
-        rotateY(${rot.value}deg)
+        translate3d(-50%, -${ALTURA / 2 - 8}px, 0)
+        scale(${scale})
+        rotateY(${rotY}deg)
     `;
 
+    // RGB rápido
     lights.forEach(l => {
-        let color;
-
-        if (colorMode.value === "rgb") {
-            const y = parseFloat(l.dataset.y);
-            const hue = (y * 1.4 + hueOffset) % 360;
-            color = `hsl(${hue},100%,60%)`;
-        } else if (colorMode.value === "fixed") {
-            color = colorPicker.value;
-        } else {
-            const colores = ["red", "green", "blue", "yellow"];
-            color = colores[Math.floor(l.dataset.y / 30) % colores.length];
-        }
-
+        const y = parseFloat(l.dataset.y);
+        const hue = (y * 1.6 + hueOffset) % 360;
+        const color = `hsl(${hue},100%,60%)`;
         l.style.background = color;
         l.style.boxShadow = `0 0 12px ${color}`;
+        l.classList.add("on");
     });
 
-    hueOffset++;
-    animarNieve();
+    hueOffset += 3;
+
+    // Nieve
+    snowflakes.forEach(s => {
+        s.style.top = (parseFloat(s.style.top) + Number(s.dataset.speed)) + "px";
+        if (parseFloat(s.style.top) > window.innerHeight) resetSnow(s);
+    });
+
+    requestAnimationFrame(loop);
 }
 
-setInterval(update, 30);
-
-/* ========== CONTROLES ========== */
-speed.oninput = () => {
-    clearInterval(timer);
-    timer = setInterval(animarLuces, speed.value);
-};
-
-toggleBtn.onclick = () => {
-    encendido = !encendido;
-    toggleBtn.innerText = encendido ? "ENCENDIDAS" : "APAGADAS";
-};
-
-size.oninput = crearArbol;
+loop();
 </script>
 
 </body>
