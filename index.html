@@ -15,6 +15,7 @@ body {
     flex-direction: column;
 }
 
+
 /* ================= ESCENA ================= */
 .scene {
     flex: 1;
@@ -23,7 +24,7 @@ body {
     overflow: hidden;
     display: flex;
     justify-content: center;
-    align-items: flex-end;
+    align-items: center;   /* ← CLAVE */
 }
 
 /* ================= ÁRBOL ================= */
@@ -167,7 +168,7 @@ let encendido = true;
 let nivel = 0;
 let hueOffset = 0;
 
-/* ========== CREAR ÁRBOL GRANDE ========== */
+/* ========== CREAR ÁRBOL ========== */
 function crearArbol() {
     tree.innerHTML = "";
     lights = [];
@@ -236,13 +237,13 @@ function animarLuces() {
 /* ========== UPDATE GENERAL ========== */
 function update() {
     tree.style.transform = `
+        translateY(-${size.value / 2}px)
         rotateX(-18deg)
         rotateY(${rot.value}deg)
     `;
 
-    // estrella en la punta real
     star.style.transform = `
-        translate3d(0px, ${size.value * 0.03}px, 0px)
+        translate3d(0px, -${size.value / 2 - 10}px, 0px)
         rotateY(${rot.value}deg)
     `;
 
