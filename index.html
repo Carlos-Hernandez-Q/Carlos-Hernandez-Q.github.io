@@ -10,7 +10,6 @@ body {
     background: black;
     height: 100vh;
     font-family: Arial, sans-serif;
-    color: white;
     overflow: hidden;
 }
 
@@ -37,7 +36,8 @@ body {
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    opacity: 0.25;
+    opacity: 0.15;
+    transition: opacity 0.2s;
 }
 .light.on { opacity: 1; }
 
@@ -75,16 +75,18 @@ const scene = document.getElementById("scene");
 const tree = document.getElementById("tree");
 const star = document.getElementById("star");
 
-/* ================== CONFIG ================== */
-let scale = 1.2;          // tamaño inicial grande
+/* ===== CONFIG ===== */
+let scale = 1.35;       // grande por defecto
 let rotY = 0;
 let rotX = -18;
 let hueOffset = 0;
+let wave = 0;
 
-/* ================== ÁRBOL ================== */
-let lights = [];
+/* ===== ÁRBOL ===== */
 const ALTURA = 520;
+const OFFSET_Y = 120;   // <<< SUBE EL ÁRBOL
 const TOTAL_LUCES = 460;
+let lights = [];
 
 function crearArbol() {
     tree.innerHTML = "";
@@ -114,7 +116,7 @@ function crearArbol() {
 
 crearArbol();
 
-/* ================== NIEVE ================== */
+/* ===== NIEVE ===== */
 let snowflakes = [];
 
 function crearNieve() {
@@ -135,7 +137,7 @@ function resetSnow(s) {
 
 crearNieve();
 
-/* ================== TOUCH / MOUSE ================== */
+/* ===== TOUCH / MOUSE ===== */
 let dragging = false;
 let lastX = 0;
 let lastDist = 0;
@@ -151,13 +153,11 @@ scene.addEventListener("pointermove", e => {
     lastX = e.clientX;
 });
 
-// Zoom con rueda (PC)
 scene.addEventListener("wheel", e => {
     scale += e.deltaY * -0.001;
     scale = Math.min(Math.max(scale, 0.6), 2.5);
 });
 
-// Pinch (touch)
 scene.addEventListener("touchmove", e => {
     if (e.touches.length === 2) {
         const dx = e.touches[0].clientX - e.touches[1].clientX;
@@ -173,35 +173,46 @@ scene.addEventListener("touchmove", e => {
 });
 scene.addEventListener("touchend", () => lastDist = 0);
 
-/* ================== LOOP ================== */
+/* ===== LOOP ===== */
 function loop() {
 
+    /* Árbol más arriba */
     tree.style.transform = `
         translate3d(-50%, -50%, 0)
+        translateY(-${OFFSET_Y}px)
         scale(${scale})
         rotateX(${rotX}deg)
         rotateY(${rotY}deg)
     `;
 
+    /* Estrella alineada */
     star.style.transform = `
-        translate3d(-50%, -${ALTURA / 2 - 8}px, 0)
+        translate3d(-50%, -${ALTURA / 2 + OFFSET_Y - 8}px, 0)
         scale(${scale})
         rotateY(${rotY}deg)
     `;
 
-    // RGB rápido
+    /* ===== ANIMACIÓN DE LUCES (OLA VISIBLE) ===== */
     lights.forEach(l => {
         const y = parseFloat(l.dataset.y);
+
+        const phase = Math.abs(y - wave);
+        const on = phase < 40;
+
         const hue = (y * 1.6 + hueOffset) % 360;
         const color = `hsl(${hue},100%,60%)`;
+
         l.style.background = color;
-        l.style.boxShadow = `0 0 12px ${color}`;
-        l.classList.add("on");
+        l.style.boxShadow = `0 0 14px ${color}`;
+        l.classList.toggle("on", on);
     });
+
+    wave += 12;
+    if (wave > ALTURA) wave = 0;
 
     hueOffset += 3;
 
-    // Nieve
+    /* Nieve */
     snowflakes.forEach(s => {
         s.style.top = (parseFloat(s.style.top) + Number(s.dataset.speed)) + "px";
         if (parseFloat(s.style.top) > window.innerHeight) resetSnow(s);
