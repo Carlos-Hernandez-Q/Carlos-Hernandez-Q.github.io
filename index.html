@@ -1,228 +1,318 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Árbol 3D RGB</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CV Online | Carlos Hernández</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-1: #0f1618;
+      --bg-2: #131f24;
+      --glass: rgba(19, 33, 39, 0.58);
+      --line: rgba(173, 227, 235, 0.35);
+      --primary: #9de6ef;
+      --secondary: #f3bf84;
+      --text: #ebf4f5;
+      --muted: #adc6ca;
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+    }
 
-<style>
-body {
-    margin: 0;
-    background: black;
-    height: 100vh;
-    font-family: Arial, sans-serif;
-    overflow: hidden;
-}
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* ESCENA */
-.scene {
-    width: 100%;
-    height: 100%;
-    perspective: 1400px;
-    position: relative;
-    overflow: hidden;
-}
+    body {
+      font-family: "Space Grotesk", sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(243, 191, 132, 0.2), transparent 42%),
+        radial-gradient(circle at 80% 70%, rgba(157, 230, 239, 0.2), transparent 38%),
+        linear-gradient(140deg, var(--bg-1), var(--bg-2));
+      overflow-x: hidden;
+    }
 
-/* ÁRBOL */
-.tree {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform-style: preserve-3d;
-}
+    .noise {
+      position: fixed; inset: 0;
+      pointer-events: none;
+      opacity: 0.08;
+      background-image: radial-gradient(#ffffff 0.45px, transparent 0.45px);
+      background-size: 3px 3px;
+      z-index: 0;
+    }
 
-/* LUCES */
-.light {
-    position: absolute;
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    opacity: 0.15;
-    transition: opacity 0.2s;
-}
-.light.on { opacity: 1; }
+    .ring {
+      position: fixed;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 50%;
+      filter: blur(0.2px);
+      z-index: 0;
+      animation: float 10s ease-in-out infinite;
+    }
 
-/* ESTRELLA */
-.star {
-    position: absolute;
-    width: 48px;
-    filter: drop-shadow(0 0 20px gold);
-    transform-style: preserve-3d;
-    z-index: 5;
-}
+    .ring.one { width: 52vw; height: 52vw; left: -14vw; top: -16vw; }
+    .ring.two { width: 38vw; height: 38vw; right: -8vw; bottom: -10vw; animation-delay: -4s; }
 
-/* NIEVE */
-.snow {
-    position: absolute;
-    width: 4px;
-    height: 4px;
-    background: white;
-    border-radius: 50%;
-    opacity: 0.85;
-    pointer-events: none;
-}
-</style>
+    .wrap {
+      position: relative;
+      z-index: 2;
+      width: min(1100px, 92vw);
+      margin: 0 auto;
+      padding: 46px 0 60px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 310px 1fr;
+      gap: 30px;
+      align-items: stretch;
+    }
+
+    .photo-card, .info-card, .section-card {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: var(--glass);
+      backdrop-filter: blur(9px);
+      box-shadow: var(--shadow);
+    }
+
+    .photo-card {
+      padding: 18px;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .photo-card::before {
+      content: "";
+      position: absolute;
+      inset: -35%;
+      background: conic-gradient(from 90deg, transparent, rgba(157, 230, 239, 0.35), transparent 30%, rgba(243, 191, 132, 0.35), transparent 60%);
+      animation: spin 9s linear infinite;
+      z-index: -1;
+    }
+
+    .photo-frame {
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: linear-gradient(120deg, #314248, #1d2a2f);
+      aspect-ratio: 3 / 4;
+    }
+
+    .photo-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transform: scale(1.03);
+    }
+
+    .tagline { margin-top: 14px; color: var(--muted); font-size: 0.93rem; letter-spacing: 0.02em; }
+
+    .info-card {
+      padding: 30px;
+      display: grid;
+      gap: 22px;
+      align-content: start;
+    }
+
+    .badge {
+      width: max-content;
+      padding: 7px 13px;
+      border-radius: 99px;
+      border: 1px solid rgba(243, 191, 132, 0.6);
+      color: var(--secondary);
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      font-family: "Cormorant Garamond", serif;
+      font-size: clamp(2.8rem, 5.2vw, 4.7rem);
+      line-height: 0.95;
+      letter-spacing: 0.01em;
+      text-wrap: balance;
+    }
+
+    .role {
+      color: var(--primary);
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-size: 0.94rem;
+    }
+
+    .summary { max-width: 60ch; color: var(--muted); line-height: 1.7; }
+
+    .contact { display: flex; flex-wrap: wrap; gap: 10px; }
+    .chip {
+      border: 1px solid rgba(157, 230, 239, 0.45);
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-size: 0.88rem;
+      color: #d4edf0;
+      background: rgba(14, 23, 26, 0.35);
+      transition: transform 0.25s ease;
+    }
+    .chip:hover { transform: translateY(-2px); }
+
+    .grid {
+      margin-top: 26px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .section-card {
+      padding: 20px;
+      transform: translateY(16px);
+      opacity: 0;
+      animation: reveal 0.9s ease forwards;
+    }
+
+    .section-card:nth-child(2) { animation-delay: 0.15s; }
+    .section-card:nth-child(3) { animation-delay: 0.3s; }
+
+    .section-title {
+      color: var(--secondary);
+      font-size: 0.84rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    ul { list-style: none; display: grid; gap: 10px; color: #d8e7ea; line-height: 1.45; }
+    li strong { color: #f4fafb; font-weight: 600; }
+
+    .progress { display: grid; gap: 9px; }
+    .bar { height: 7px; border-radius: 99px; background: rgba(255, 255, 255, 0.1); overflow: hidden; }
+    .bar span {
+      display: block; height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      border-radius: inherit; width: 0;
+      animation: load 1.2s ease forwards;
+    }
+
+    /* Ajusté las barras a lo que haces (embedded/IoT/industrial/software) */
+    .bar:nth-child(1) span { animation-delay: 0.2s; width: 92%; } /* Embedded/IoT */
+    .bar:nth-child(2) span { animation-delay: 0.35s; width: 88%; } /* Backend/Integraciones */
+    .bar:nth-child(3) span { animation-delay: 0.5s; width: 84%; } /* Redes/Protocolos */
+    .bar:nth-child(4) span { animation-delay: 0.65s; width: 80%; } /* UI/Dashboards */
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(12px); } }
+    @keyframes reveal { to { transform: translateY(0); opacity: 1; } }
+    @keyframes load { from { width: 0; } }
+
+    @media (max-width: 930px) {
+      .hero { grid-template-columns: 1fr; }
+      .photo-card { width: min(360px, 100%); margin: 0 auto; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
-
 <body>
+  <div class="noise"></div>
+  <div class="ring one"></div>
+  <div class="ring two"></div>
 
-<div class="scene" id="scene">
-    <div class="tree" id="tree"></div>
-    <img src="star.png" class="star" id="star">
-</div>
+  <main class="wrap">
+    <section class="hero">
+      <article class="photo-card">
+        <div class="photo-frame">
+          <!-- TODO: pon tu foto aquí -->
+          <img src="tu-foto.jpg" alt="Foto profesional" onerror="this.src='staryu-pokemon-red-and-blue-pokemon-go-pokemon-go.jpg';">
+        </div>
+        <p class="tagline">Automatización, IoT y sistemas embebidos con enfoque industrial.</p>
+      </article>
 
-<script>
-const scene = document.getElementById("scene");
-const tree = document.getElementById("tree");
-const star = document.getElementById("star");
+      <article class="info-card">
+        <span class="badge">Disponible para nuevos proyectos</span>
 
-/* ===== CONFIG ===== */
-let scale = 1.35;       // grande por defecto
-let rotY = 0;
-let rotX = -18;
-let hueOffset = 0;
-let wave = 0;
+        <!-- TODO: nombre -->
+        <h1>Juan Carlos<br>Ramírez Hernández</h1>
 
-/* ===== ÁRBOL ===== */
-const ALTURA = 520;
-const OFFSET_Y = 120;   // <<< SUBE EL ÁRBOL
-const TOTAL_LUCES = 460;
-let lights = [];
+        <p class="role">Embedded · IoT Developer · Industrial Automation</p>
 
-function crearArbol() {
-    tree.innerHTML = "";
-    lights = [];
+        <p class="summary">
+          Desarrollo soluciones end-to-end para monitoreo y control industrial: firmware (ESP32/RP2040),
+          comunicaciones (Modbus TCP, MQTT/MQTTS, LoRa/LoRaWAN), y plataformas en Raspberry Pi (Flask, dashboards y APIs).
+          También diseño prácticas y material técnico para formación en electrónica y automatización.
+        </p>
 
-    for (let i = 0; i < TOTAL_LUCES; i++) {
-        const l = document.createElement("div");
-        l.className = "light";
+        <div class="contact">
+          <!-- TODO: ciudad/país -->
+          <span class="chip">Xalapa, Veracruz, México</span>
 
-        const y = (i / TOTAL_LUCES) * ALTURA;
-        const r = (ALTURA - y) / 2.6;
-        const a = i * 0.32;
+          <!-- TODO: correo/teléfono/links reales -->
+          <span class="chip">juanramirezupav@gmail.com</span>
+          <span class="chip">22 82 69 05 16</span>
+          <span class="chip">www.linkedin.com/in/carlos-hernandez-a79a6b248</span>
+          <span class="chip">https://github.com/Carlos-Hernandez-Q</span>
+        </div>
+      </article>
+    </section>
 
-        const x = Math.cos(a) * r;
-        const z = Math.sin(a) * r;
+    <section class="grid">
+      <article class="section-card">
+        <p class="section-title">Experiencia destacada</p>
+        <ul>
+          <li>
+            <strong>Sistemas IoT industriales</strong> | ESP32 / RP2040 / Raspberry Pi<br>
+            Firmware, adquisición de datos, control de E/S, comunicación serial y despliegue local.
+          </li>
+          <li>
+            <strong>Integraciones industriales</strong> | PLC · Modbus TCP/IP · Redes<br>
+            Diseño de protocolos, mapeo de registros y validación de señales para entornos educativos/industriales.
+          </li>
+          <li>
+            <strong>Dashboards y monitoreo</strong> | Flask · JSON · Grafana/Node-RED (según proyecto)<br>
+            APIs y UI para visualizar estados de máquina, eficiencia, eventos y telemetría en tiempo real.
+          </li>
+          <li>
+            <strong>Visión artificial aplicada</strong> | OpenCV en Raspberry Pi<br>
+            Detección y tracking en video para conteo/validación de piezas y análisis por contornos.
+          </li>
+        </ul>
+      </article>
 
-        l.dataset.y = ALTURA - y;
+      <article class="section-card">
+        <p class="section-title">Habilidades clave</p>
+        <div class="progress">
+          <div class="bar"><span></span></div>
+          <div class="bar"><span></span></div>
+          <div class="bar"><span></span></div>
+          <div class="bar"><span></span></div>
+        </div>
+        <ul>
+          <li>Firmware: ESP32, RP2040 (MicroPython / Arduino / FreeRTOS)</li>
+          <li>Protocolos: MQTT/MQTTS, Modbus TCP, UART/I2C/SPI</li>
+          <li>Linux/Raspberry Pi: despliegue, servicios, kiosko, hardening</li>
+          <li>Backend/UI: Flask, APIs REST, JSON, dashboards</li>
+        </ul>
+      </article>
 
-        l.style.transform = `
-            translate3d(${x}px, ${ALTURA - y}px, ${z}px)
-        `;
-
-        tree.appendChild(l);
-        lights.push(l);
-    }
-}
-
-crearArbol();
-
-/* ===== NIEVE ===== */
-let snowflakes = [];
-
-function crearNieve() {
-    for (let i = 0; i < 180; i++) {
-        const s = document.createElement("div");
-        s.className = "snow";
-        resetSnow(s);
-        scene.appendChild(s);
-        snowflakes.push(s);
-    }
-}
-
-function resetSnow(s) {
-    s.style.left = Math.random() * window.innerWidth + "px";
-    s.style.top = -10 + "px";
-    s.dataset.speed = 1.5 + Math.random() * 3;
-}
-
-crearNieve();
-
-/* ===== TOUCH / MOUSE ===== */
-let dragging = false;
-let lastX = 0;
-let lastDist = 0;
-
-scene.addEventListener("pointerdown", e => {
-    dragging = true;
-    lastX = e.clientX;
-});
-scene.addEventListener("pointerup", () => dragging = false);
-scene.addEventListener("pointermove", e => {
-    if (!dragging) return;
-    rotY += (e.clientX - lastX) * 0.3;
-    lastX = e.clientX;
-});
-
-scene.addEventListener("wheel", e => {
-    scale += e.deltaY * -0.001;
-    scale = Math.min(Math.max(scale, 0.6), 2.5);
-});
-
-scene.addEventListener("touchmove", e => {
-    if (e.touches.length === 2) {
-        const dx = e.touches[0].clientX - e.touches[1].clientX;
-        const dy = e.touches[0].clientY - e.touches[1].clientY;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-
-        if (lastDist) {
-            scale += (dist - lastDist) * 0.002;
-            scale = Math.min(Math.max(scale, 0.6), 2.5);
-        }
-        lastDist = dist;
-    }
-});
-scene.addEventListener("touchend", () => lastDist = 0);
-
-/* ===== LOOP ===== */
-function loop() {
-
-    /* Árbol más arriba */
-    tree.style.transform = `
-        translate3d(-50%, -50%, 0)
-        translateY(-${OFFSET_Y}px)
-        scale(${scale})
-        rotateX(${rotX}deg)
-        rotateY(${rotY}deg)
-    `;
-
-    /* Estrella alineada */
-    star.style.transform = `
-        translate3d(-50%, -${ALTURA / 2 + OFFSET_Y - 8}px, 0)
-        scale(${scale})
-        rotateY(${rotY}deg)
-    `;
-
-    /* ===== ANIMACIÓN DE LUCES (OLA VISIBLE) ===== */
-    lights.forEach(l => {
-        const y = parseFloat(l.dataset.y);
-
-        const phase = Math.abs(y - wave);
-        const on = phase < 40;
-
-        const hue = (y * 1.6 + hueOffset) % 360;
-        const color = `hsl(${hue},100%,60%)`;
-
-        l.style.background = color;
-        l.style.boxShadow = `0 0 14px ${color}`;
-        l.classList.toggle("on", on);
-    });
-
-    wave += 12;
-    if (wave > ALTURA) wave = 0;
-
-    hueOffset += 3;
-
-    /* Nieve */
-    snowflakes.forEach(s => {
-        s.style.top = (parseFloat(s.style.top) + Number(s.dataset.speed)) + "px";
-        if (parseFloat(s.style.top) > window.innerHeight) resetSnow(s);
-    });
-
-    requestAnimationFrame(loop);
-}
-
-loop();
-</script>
-
+      <article class="section-card">
+        <p class="section-title">Logros</p>
+        <ul>
+          <li>
+            <strong>Tarjeta de adquisición RP2040</strong><br>
+            Desarrollo de hardware + firmware para E/S industriales (0–10V, 4–20mA, DI, relé y transistor) con Modbus TCP.
+          </li>
+          <li>
+            <strong>Sistemas de monitoreo en Raspberry Pi</strong><br>
+            Integración de lectura serial, lógica de estados de máquina y publicación de datos a interfaz web.
+          </li>
+          <li>
+            <strong>Docencia técnica</strong><br>
+            Material práctico para programación, electrónica, protocolos y automatización (enfoque claro y aplicable).
+          </li>
+        </ul>
+      </article>
+    </section>
+  </main>
 </body>
 </html>
