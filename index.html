@@ -1,318 +1,994 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CV Online | Carlos Hernández</title>
+  <title>Carlos Hernandez | CV Interactivo</title>
+  <meta name="description" content="CV interactivo de Carlos Hernandez: IoT, sistemas embebidos y automatizacion industrial.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-1: #0f1618;
-      --bg-2: #131f24;
-      --glass: rgba(19, 33, 39, 0.58);
-      --line: rgba(173, 227, 235, 0.35);
-      --primary: #9de6ef;
-      --secondary: #f3bf84;
-      --text: #ebf4f5;
-      --muted: #adc6ca;
-      --shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+      --bg-dark: #030507;
+      --bg-mid: #0a1014;
+      --bg-light: #121b22;
+      --cyan: #4de7ff;
+      --teal: #0ea8a8;
+      --amber: #ffc357;
+      --rose: #ff6b6b;
+      --text: #f2fbff;
+      --muted: #9ec0cd;
+      --line: rgba(77, 231, 255, 0.26);
+      --glass: rgba(8, 18, 24, 0.68);
+      --radius: 20px;
+      --shadow: 0 22px 50px rgba(0, 0, 0, 0.35);
+      --max: 1140px;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+    }
 
     body {
-      font-family: "Space Grotesk", sans-serif;
+      margin: 0;
+      font-family: "Sora", sans-serif;
       color: var(--text);
-      min-height: 100vh;
       background:
-        radial-gradient(circle at 20% 10%, rgba(243, 191, 132, 0.2), transparent 42%),
-        radial-gradient(circle at 80% 70%, rgba(157, 230, 239, 0.2), transparent 38%),
-        linear-gradient(140deg, var(--bg-1), var(--bg-2));
+        radial-gradient(1200px 760px at 88% -10%, rgba(77, 231, 255, 0.2), transparent 62%),
+        radial-gradient(1050px 700px at 12% 110%, rgba(255, 107, 107, 0.14), transparent 64%),
+        linear-gradient(130deg, var(--bg-dark), var(--bg-mid) 52%, var(--bg-light));
+      min-height: 100vh;
       overflow-x: hidden;
     }
 
-    .noise {
-      position: fixed; inset: 0;
-      pointer-events: none;
-      opacity: 0.08;
-      background-image: radial-gradient(#ffffff 0.45px, transparent 0.45px);
-      background-size: 3px 3px;
-      z-index: 0;
-    }
-
-    .ring {
+    .aurora {
       position: fixed;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 50%;
-      filter: blur(0.2px);
+      inset: -20% -10%;
+      pointer-events: none;
       z-index: 0;
-      animation: float 10s ease-in-out infinite;
+      filter: blur(62px);
+      opacity: 0.58;
+      background:
+        radial-gradient(circle at 25% 20%, rgba(77, 231, 255, 0.42), transparent 34%),
+        radial-gradient(circle at 74% 38%, rgba(14, 168, 168, 0.3), transparent 30%),
+        radial-gradient(circle at 52% 76%, rgba(255, 107, 107, 0.24), transparent 34%);
+      animation: drift 18s ease-in-out infinite alternate;
+      transform: translate3d(var(--mx, 0), var(--my, 0), 0);
     }
 
-    .ring.one { width: 52vw; height: 52vw; left: -14vw; top: -16vw; }
-    .ring.two { width: 38vw; height: 38vw; right: -8vw; bottom: -10vw; animation-delay: -4s; }
+    .grid-noise {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.07;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.28) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.28) 1px, transparent 1px);
+      background-size: 34px 34px;
+      mask-image: radial-gradient(circle at center, black 52%, transparent 100%);
+    }
 
-    .wrap {
+    .site {
       position: relative;
       z-index: 2;
-      width: min(1100px, 92vw);
+      width: min(var(--max), 92vw);
       margin: 0 auto;
-      padding: 46px 0 60px;
+      padding: 26px 0 52px;
     }
 
-    .hero {
-      display: grid;
-      grid-template-columns: 310px 1fr;
-      gap: 30px;
-      align-items: stretch;
-    }
-
-    .photo-card, .info-card, .section-card {
+    .topbar {
+      position: sticky;
+      top: 14px;
+      z-index: 5;
       border: 1px solid var(--line);
-      border-radius: 24px;
-      background: var(--glass);
-      backdrop-filter: blur(9px);
+      border-radius: 999px;
+      padding: 9px 10px;
+      background: rgba(5, 15, 21, 0.78);
+      backdrop-filter: blur(10px);
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
       box-shadow: var(--shadow);
     }
 
-    .photo-card {
-      padding: 18px;
+    .nav-btn {
+      border: 1px solid transparent;
+      border-radius: 999px;
+      color: var(--text);
+      background: transparent;
+      padding: 10px 16px;
+      font: 600 0.9rem/1 "Sora", sans-serif;
+      letter-spacing: 0.04em;
+      cursor: pointer;
       position: relative;
       overflow: hidden;
+      transition: transform 180ms ease, background 180ms ease, border-color 180ms ease;
+    }
+
+    .nav-btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(77, 231, 255, 0.38);
+      background: rgba(77, 231, 255, 0.1);
+    }
+
+    .nav-btn.active {
+      background: linear-gradient(90deg, rgba(77, 231, 255, 0.2), rgba(255, 195, 87, 0.16));
+      border-color: rgba(255, 195, 87, 0.76);
+      box-shadow: 0 0 0 1px rgba(77, 231, 255, 0.22), 0 0 24px rgba(77, 231, 255, 0.15);
+      animation: activePulse 2.2s ease-in-out infinite;
+    }
+
+    .ripple {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: rgba(255, 255, 255, 0.45);
+      animation: ripple 520ms ease-out forwards;
+      pointer-events: none;
+    }
+
+    .hero {
+      margin-top: 22px;
+      display: grid;
+      gap: 24px;
+      grid-template-columns: 320px 1fr;
+      align-items: stretch;
+      overflow: hidden;
+      max-height: 1200px;
+      opacity: 1;
+      transform: translateY(0);
+      transition: max-height 480ms ease, opacity 320ms ease, transform 320ms ease, margin-top 320ms ease;
+    }
+
+    .hero.collapsed {
+      max-height: 0;
+      opacity: 0;
+      transform: translateY(-14px);
+      margin-top: 0;
+      pointer-events: none;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--glass);
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+      transition: transform 250ms ease, border-color 250ms ease, box-shadow 250ms ease;
+    }
+
+    .profile {
+      padding: 16px;
+      overflow: hidden;
+      position: relative;
       isolation: isolate;
     }
 
-    .photo-card::before {
+    .profile::before {
       content: "";
       position: absolute;
-      inset: -35%;
-      background: conic-gradient(from 90deg, transparent, rgba(157, 230, 239, 0.35), transparent 30%, rgba(243, 191, 132, 0.35), transparent 60%);
-      animation: spin 9s linear infinite;
+      inset: -40%;
       z-index: -1;
+      background: conic-gradient(from 90deg, transparent, rgba(77, 231, 255, 0.22), transparent 40%, rgba(255, 195, 87, 0.2), transparent 72%);
+      animation: spin 11s linear infinite;
     }
 
-    .photo-frame {
-      border-radius: 18px;
+    .portrait {
+      border-radius: 16px;
       overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      background: linear-gradient(120deg, #314248, #1d2a2f);
+      border: 1px solid rgba(255, 255, 255, 0.25);
       aspect-ratio: 3 / 4;
+      background: linear-gradient(130deg, #2d4d5a, #10202b);
     }
 
-    .photo-frame img {
+    .portrait img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      transform: scale(1.02);
       display: block;
-      transform: scale(1.03);
     }
 
-    .tagline { margin-top: 14px; color: var(--muted); font-size: 0.93rem; letter-spacing: 0.02em; }
-
-    .info-card {
+    .headline {
       padding: 30px;
       display: grid;
-      gap: 22px;
-      align-content: start;
+      align-content: center;
+      gap: 16px;
     }
 
-    .badge {
-      width: max-content;
-      padding: 7px 13px;
-      border-radius: 99px;
-      border: 1px solid rgba(243, 191, 132, 0.6);
-      color: var(--secondary);
-      font-size: 0.82rem;
-      letter-spacing: 0.08em;
+    .kicker {
+      width: fit-content;
+      border: 1px solid rgba(255, 195, 87, 0.75);
+      color: var(--amber);
+      border-radius: 999px;
+      font-size: 0.75rem;
       text-transform: uppercase;
+      letter-spacing: 0.12em;
+      padding: 6px 12px;
     }
 
     h1 {
-      font-family: "Cormorant Garamond", serif;
-      font-size: clamp(2.8rem, 5.2vw, 4.7rem);
-      line-height: 0.95;
-      letter-spacing: 0.01em;
-      text-wrap: balance;
+      margin: 0;
+      font-family: "Bebas Neue", sans-serif;
+      font-weight: 400;
+      font-size: clamp(2.5rem, 6.3vw, 4.8rem);
+      letter-spacing: 0.035em;
+      line-height: 0.92;
+      white-space: nowrap;
     }
 
     .role {
-      color: var(--primary);
-      font-weight: 700;
-      letter-spacing: 0.06em;
       text-transform: uppercase;
-      font-size: 0.94rem;
+      letter-spacing: 0.14em;
+      font-size: 0.84rem;
+      font-weight: 700;
+      margin: 0;
+      background: linear-gradient(90deg, var(--cyan), var(--amber), var(--rose), var(--cyan));
+      background-size: 220% 220%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: shimmer 7s linear infinite;
     }
 
-    .summary { max-width: 60ch; color: var(--muted); line-height: 1.7; }
+    .summary {
+      max-width: 66ch;
+      color: var(--muted);
+      line-height: 1.7;
+      margin: 0;
+    }
 
-    .contact { display: flex; flex-wrap: wrap; gap: 10px; }
+    .chips {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
     .chip {
-      border: 1px solid rgba(157, 230, 239, 0.45);
-      padding: 8px 12px;
-      border-radius: 12px;
-      font-size: 0.88rem;
-      color: #d4edf0;
-      background: rgba(14, 23, 26, 0.35);
-      transition: transform 0.25s ease;
+      border: 1px solid rgba(77, 231, 255, 0.42);
+      border-radius: 10px;
+      padding: 8px 11px;
+      font-size: 0.82rem;
+      color: #cff5f9;
+      background: rgba(4, 20, 29, 0.45);
     }
-    .chip:hover { transform: translateY(-2px); }
 
-    .grid {
-      margin-top: 26px;
+    .stats {
+      margin-top: 24px;
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .stat {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(4, 17, 25, 0.5);
+    }
+
+    .stat strong {
+      display: block;
+      font-size: clamp(1.2rem, 2.4vw, 2rem);
+      margin-bottom: 2px;
+      color: var(--cyan);
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 0.78rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .panel-wrap {
+      margin-top: 24px;
+      position: relative;
+      min-height: 480px;
+    }
+
+    .panel {
+      display: none;
+      animation: tab-in 340ms ease;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    .panel-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 18px;
     }
 
-    .section-card {
-      padding: 20px;
-      transform: translateY(16px);
-      opacity: 0;
-      animation: reveal 0.9s ease forwards;
+    .tile {
+      padding: 22px;
+      position: relative;
+      overflow: hidden;
     }
 
-    .section-card:nth-child(2) { animation-delay: 0.15s; }
-    .section-card:nth-child(3) { animation-delay: 0.3s; }
+    .tile:hover {
+      transform: translateY(-4px);
+      border-color: rgba(77, 231, 255, 0.46);
+      box-shadow: 0 24px 55px rgba(0, 0, 0, 0.42), 0 0 35px rgba(77, 231, 255, 0.1);
+    }
 
-    .section-title {
-      color: var(--secondary);
-      font-size: 0.84rem;
+    .tile h2 {
+      margin: 0 0 14px;
+      font: 400 2rem/1 "Bebas Neue", sans-serif;
+      letter-spacing: 0.05em;
+      color: #e9fbff;
+    }
+
+    .tile p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .timeline {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 14px;
+    }
+
+    .timeline li {
+      border-left: 2px solid rgba(77, 231, 255, 0.35);
+      padding: 2px 0 2px 14px;
+      color: #e3f6fb;
+      line-height: 1.55;
+    }
+
+    .timeline li span {
+      display: block;
+      color: var(--amber);
+      font-size: 0.78rem;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      margin-bottom: 12px;
+      margin-bottom: 2px;
     }
 
-    ul { list-style: none; display: grid; gap: 10px; color: #d8e7ea; line-height: 1.45; }
-    li strong { color: #f4fafb; font-weight: 600; }
+    .skill-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 11px;
+    }
 
-    .progress { display: grid; gap: 9px; }
-    .bar { height: 7px; border-radius: 99px; background: rgba(255, 255, 255, 0.1); overflow: hidden; }
+    .skill-list li {
+      display: grid;
+      gap: 6px;
+    }
+
+    .skill-list label {
+      font-size: 0.86rem;
+      color: #e2f6fb;
+      letter-spacing: 0.02em;
+    }
+
+    .bar {
+      height: 8px;
+      border-radius: 99px;
+      background: rgba(255, 255, 255, 0.12);
+      overflow: hidden;
+    }
+
     .bar span {
-      display: block; height: 100%;
-      background: linear-gradient(90deg, var(--primary), var(--secondary));
-      border-radius: inherit; width: 0;
-      animation: load 1.2s ease forwards;
+      display: block;
+      height: 100%;
+      width: 0;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--cyan), var(--amber));
+      transition: width 900ms cubic-bezier(0.2, 0.8, 0.2, 1);
     }
 
-    /* Ajusté las barras a lo que haces (embedded/IoT/industrial/software) */
-    .bar:nth-child(1) span { animation-delay: 0.2s; width: 92%; } /* Embedded/IoT */
-    .bar:nth-child(2) span { animation-delay: 0.35s; width: 88%; } /* Backend/Integraciones */
-    .bar:nth-child(3) span { animation-delay: 0.5s; width: 84%; } /* Redes/Protocolos */
-    .bar:nth-child(4) span { animation-delay: 0.65s; width: 80%; } /* UI/Dashboards */
+    .projects-shell {
+      display: grid;
+      grid-template-columns: 290px 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .project-index {
+      display: grid;
+      gap: 10px;
+      border-right: 1px solid rgba(77, 231, 255, 0.2);
+      padding-right: 14px;
+    }
+
+    .project-link {
+      width: 100%;
+      border: 1px solid rgba(77, 231, 255, 0.3);
+      border-radius: 12px;
+      background: rgba(5, 17, 24, 0.58);
+      color: #d9f8ff;
+      text-align: left;
+      cursor: pointer;
+      padding: 12px;
+      display: grid;
+      gap: 4px;
+      transition: border-color 220ms ease, transform 220ms ease, background 220ms ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .project-link:hover {
+      transform: translateX(2px);
+      border-color: rgba(255, 195, 87, 0.6);
+      background: rgba(8, 22, 31, 0.72);
+    }
+
+    .project-link.active {
+      border-color: rgba(255, 195, 87, 0.84);
+      background: linear-gradient(135deg, rgba(77, 231, 255, 0.16), rgba(255, 195, 87, 0.16));
+      box-shadow: 0 0 26px rgba(77, 231, 255, 0.18);
+    }
+
+    .project-link.active::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: 8px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--amber);
+      transform: translateY(-50%);
+      box-shadow: 0 0 10px rgba(255, 195, 87, 0.8);
+    }
+
+    .project-link-title {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: #effdff;
+    }
+
+    .project-link-sub {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #9ed6e2;
+    }
+
+    .project-display {
+      position: relative;
+      min-height: 352px;
+    }
+
+    .project-view {
+      display: none;
+      opacity: 0;
+      transform: translateX(16px);
+    }
+
+    .project-view.active {
+      display: grid;
+      gap: 12px;
+      animation: projectEnter 420ms ease forwards;
+    }
+
+    .project-headline {
+      margin: 0;
+      font-size: 1.2rem;
+      color: #f0fcff;
+      letter-spacing: 0.02em;
+    }
+
+    .project-meta {
+      margin: 0;
+      color: var(--amber);
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .project-media {
+      border: 1px solid rgba(77, 231, 255, 0.35);
+      border-radius: 12px;
+      overflow: hidden;
+      background: rgba(2, 10, 15, 0.7);
+    }
+
+    .project-media-track {
+      transform: translateX(-18px);
+      opacity: 0.3;
+      transition: transform 520ms ease, opacity 520ms ease;
+    }
+
+    .project-view.active .project-media-track {
+      transform: translateX(0);
+      opacity: 1;
+    }
+
+    .project-media-frame {
+      min-height: 150px;
+      position: relative;
+      border: 1px dashed rgba(255, 195, 87, 0.46);
+      border-radius: 10px;
+      margin: 10px;
+      display: grid;
+      place-items: center;
+      color: #c6eaf2;
+      font-size: 0.82rem;
+      letter-spacing: 0.03em;
+      background:
+        linear-gradient(125deg, rgba(77, 231, 255, 0.08), rgba(255, 107, 107, 0.08)),
+        repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.04) 0 10px, transparent 10px 20px);
+      overflow: hidden;
+    }
+
+    .project-media-frame::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, 0.18), transparent 70%);
+      transform: translateX(-120%);
+      animation: placeholderSweep 2.6s linear infinite;
+      pointer-events: none;
+    }
+
+    .project-desc {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 0.92rem;
+    }
+
+    .contact-card {
+      display: grid;
+      gap: 12px;
+    }
+
+    .contact-link {
+      text-decoration: none;
+      color: #dbf7ff;
+      border: 1px solid rgba(77, 231, 255, 0.45);
+      border-radius: 12px;
+      padding: 12px 14px;
+      background: rgba(5, 22, 31, 0.45);
+      transition: transform 170ms ease, border-color 170ms ease;
+    }
+
+    .contact-link:hover {
+      transform: translateX(2px);
+      border-color: rgba(255, 195, 87, 0.75);
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 550ms ease, transform 550ms ease;
+    }
+
+    .reveal.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
 
     @keyframes spin { to { transform: rotate(360deg); } }
-    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(12px); } }
-    @keyframes reveal { to { transform: translateY(0); opacity: 1; } }
-    @keyframes load { from { width: 0; } }
+    @keyframes drift { 0% { transform: translate3d(-2%, -1%, 0); } 100% { transform: translate3d(2%, 1.5%, 0); } }
+    @keyframes tab-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes sweep { 0% { transform: translate(-120%, -10%) rotate(22deg); } 100% { transform: translate(320%, -10%) rotate(22deg); } }
+    @keyframes placeholderSweep { 0% { transform: translateX(-120%); } 100% { transform: translateX(120%); } }
+    @keyframes projectEnter { to { opacity: 1; transform: translateX(0); } }
+    @keyframes shimmer { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
+    @keyframes ripple { to { transform: translate(-50%, -50%) scale(18); opacity: 0; } }
+    @keyframes activePulse {
+      0%, 100% { box-shadow: 0 0 0 1px rgba(77, 231, 255, 0.22), 0 0 24px rgba(77, 231, 255, 0.15); }
+      50% { box-shadow: 0 0 0 1px rgba(255, 195, 87, 0.45), 0 0 28px rgba(255, 107, 107, 0.2); }
+    }
 
-    @media (max-width: 930px) {
+    @media (max-width: 980px) {
       .hero { grid-template-columns: 1fr; }
-      .photo-card { width: min(360px, 100%); margin: 0 auto; }
-      .grid { grid-template-columns: 1fr; }
+      .profile { width: min(330px, 100%); margin: 0 auto; }
+      .panel-grid,
+      .projects-shell,
+      .stats { grid-template-columns: 1fr; }
+      h1 { white-space: normal; }
+      .project-index {
+        border-right: 0;
+        padding-right: 0;
+      }
+    }
+
+    @media (max-width: 760px) {
+      body { padding-bottom: 88px; }
+
+      .site {
+        width: min(var(--max), 94vw);
+        padding-top: 14px;
+      }
+
+      .topbar {
+        position: fixed;
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        top: auto;
+        padding: 8px;
+        justify-content: space-between;
+        flex-wrap: nowrap;
+        border-radius: 18px;
+        background: rgba(4, 11, 16, 0.86);
+      }
+
+      .nav-btn {
+        flex: 1 1 auto;
+        min-width: 0;
+        padding: 10px 6px;
+        font-size: 0.75rem;
+        letter-spacing: 0.02em;
+      }
+
+      .hero { margin-top: 14px; }
+
+      .project-index {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding-bottom: 4px;
+      }
+
+      .project-link {
+        min-width: 180px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; transition: none !important; }
+      html { scroll-behavior: auto; }
     }
   </style>
 </head>
 <body>
-  <div class="noise"></div>
-  <div class="ring one"></div>
-  <div class="ring two"></div>
+  <div class="aurora" id="aurora"></div>
+  <div class="grid-noise"></div>
 
-  <main class="wrap">
+  <main class="site">
+    <nav class="topbar" aria-label="Secciones">
+      <button class="nav-btn active" data-tab="perfil">Perfil</button>
+      <button class="nav-btn" data-tab="experiencia">Experiencia</button>
+      <button class="nav-btn" data-tab="proyectos">Proyectos</button>
+      <button class="nav-btn" data-tab="contacto">Contacto</button>
+    </nav>
+
     <section class="hero">
-      <article class="photo-card">
-        <div class="photo-frame">
-          <!-- TODO: pon tu foto aquí -->
-          <img src="tu-foto.jpg" alt="Foto profesional" onerror="this.src='staryu-pokemon-red-and-blue-pokemon-go-pokemon-go.jpg';">
+      <article class="card profile reveal">
+        <div class="portrait">
+          <img src="tu-foto.jpg" alt="Foto de Carlos Hernandez" onerror="this.src='staryu-pokemon-red-and-blue-pokemon-go-pokemon-go.jpg'">
         </div>
-        <p class="tagline">Automatización, IoT y sistemas embebidos con enfoque industrial.</p>
       </article>
 
-      <article class="info-card">
-        <span class="badge">Disponible para nuevos proyectos</span>
-
-        <!-- TODO: nombre -->
-        <h1>Juan Carlos<br>Ramírez Hernández</h1>
-
-        <p class="role">Embedded · IoT Developer · Industrial Automation</p>
-
+      <article class="card headline reveal">
+        <span class="kicker">Disponible para proyectos</span>
+        <h1>Carlos Hernandez</h1>
+        <p class="role">Embedded + IoT + Automatizacion Industrial</p>
         <p class="summary">
-          Desarrollo soluciones end-to-end para monitoreo y control industrial: firmware (ESP32/RP2040),
-          comunicaciones (Modbus TCP, MQTT/MQTTS, LoRa/LoRaWAN), y plataformas en Raspberry Pi (Flask, dashboards y APIs).
-          También diseño prácticas y material técnico para formación en electrónica y automatización.
+          Ingeniero orientado a construir sistemas conectados end-to-end: firmware, protocolos industriales,
+          integracion en Raspberry Pi y visualizacion de datos para decisiones operativas en tiempo real.
         </p>
-
-        <div class="contact">
-          <!-- TODO: ciudad/país -->
-          <span class="chip">Xalapa, Veracruz, México</span>
-
-          <!-- TODO: correo/teléfono/links reales -->
-          <span class="chip">juanramirezupav@gmail.com</span>
-          <span class="chip">22 82 69 05 16</span>
-          <span class="chip">www.linkedin.com/in/carlos-hernandez-a79a6b248</span>
-          <span class="chip">https://github.com/Carlos-Hernandez-Q</span>
+        <div class="chips">
+          <span class="chip">Xalapa, Veracruz, Mexico</span>
+          <span class="chip">Flask / APIs / Dashboards</span>
+          <span class="chip">MQTT, Modbus TCP, LoRa</span>
+        </div>
+        <div class="stats">
+          <article class="stat">
+            <strong data-count="6">0</strong>
+            <span>Areas tecnicas</span>
+          </article>
+          <article class="stat">
+            <strong data-count="18">0</strong>
+            <span>Proyectos aplicados</span>
+          </article>
+          <article class="stat">
+            <strong data-count="4">0</strong>
+            <span>Stacks principales</span>
+          </article>
         </div>
       </article>
     </section>
 
-    <section class="grid">
-      <article class="section-card">
-        <p class="section-title">Experiencia destacada</p>
-        <ul>
-          <li>
-            <strong>Sistemas IoT industriales</strong> | ESP32 / RP2040 / Raspberry Pi<br>
-            Firmware, adquisición de datos, control de E/S, comunicación serial y despliegue local.
-          </li>
-          <li>
-            <strong>Integraciones industriales</strong> | PLC · Modbus TCP/IP · Redes<br>
-            Diseño de protocolos, mapeo de registros y validación de señales para entornos educativos/industriales.
-          </li>
-          <li>
-            <strong>Dashboards y monitoreo</strong> | Flask · JSON · Grafana/Node-RED (según proyecto)<br>
-            APIs y UI para visualizar estados de máquina, eficiencia, eventos y telemetría en tiempo real.
-          </li>
-          <li>
-            <strong>Visión artificial aplicada</strong> | OpenCV en Raspberry Pi<br>
-            Detección y tracking en video para conteo/validación de piezas y análisis por contornos.
-          </li>
-        </ul>
-      </article>
+    <section class="panel-wrap">
+      <section class="panel active" id="perfil">
+        <div class="panel-grid">
+          <article class="card tile reveal">
+            <h2>Resumen Profesional</h2>
+            <p>
+              Desarrollo soluciones de monitoreo y control industrial desde hardware hasta interfaz web.
+              Tengo experiencia en adquisicion de datos, comunicaciones robustas y despliegues locales
+              para ambientes de planta, laboratorio y entrenamiento tecnico.
+            </p>
+          </article>
 
-      <article class="section-card">
-        <p class="section-title">Habilidades clave</p>
-        <div class="progress">
-          <div class="bar"><span></span></div>
-          <div class="bar"><span></span></div>
-          <div class="bar"><span></span></div>
-          <div class="bar"><span></span></div>
+          <article class="card tile reveal">
+            <h2>Stack Tecnico</h2>
+            <ul class="skill-list">
+              <li>
+                <label>Embedded (ESP32, RP2040, FreeRTOS)</label>
+                <div class="bar"><span data-width="92%"></span></div>
+              </li>
+              <li>
+                <label>Protocolos (MQTT, Modbus TCP, UART/I2C/SPI)</label>
+                <div class="bar"><span data-width="89%"></span></div>
+              </li>
+              <li>
+                <label>Linux + Raspberry Pi (servicios, kiosko, hardening)</label>
+                <div class="bar"><span data-width="86%"></span></div>
+              </li>
+              <li>
+                <label>Backend / UI (Flask, REST, visualizacion)</label>
+                <div class="bar"><span data-width="82%"></span></div>
+              </li>
+            </ul>
+          </article>
         </div>
-        <ul>
-          <li>Firmware: ESP32, RP2040 (MicroPython / Arduino / FreeRTOS)</li>
-          <li>Protocolos: MQTT/MQTTS, Modbus TCP, UART/I2C/SPI</li>
-          <li>Linux/Raspberry Pi: despliegue, servicios, kiosko, hardening</li>
-          <li>Backend/UI: Flask, APIs REST, JSON, dashboards</li>
-        </ul>
-      </article>
+      </section>
 
-      <article class="section-card">
-        <p class="section-title">Logros</p>
-        <ul>
-          <li>
-            <strong>Tarjeta de adquisición RP2040</strong><br>
-            Desarrollo de hardware + firmware para E/S industriales (0–10V, 4–20mA, DI, relé y transistor) con Modbus TCP.
-          </li>
-          <li>
-            <strong>Sistemas de monitoreo en Raspberry Pi</strong><br>
-            Integración de lectura serial, lógica de estados de máquina y publicación de datos a interfaz web.
-          </li>
-          <li>
-            <strong>Docencia técnica</strong><br>
-            Material práctico para programación, electrónica, protocolos y automatización (enfoque claro y aplicable).
-          </li>
-        </ul>
-      </article>
+      <section class="panel" id="experiencia">
+        <div class="panel-grid">
+          <article class="card tile reveal">
+            <h2>Trayectoria</h2>
+            <ul class="timeline">
+              <li>
+                <span>2025 - Actual</span>
+                Sistemas IoT industriales con ESP32/RP2040: captura de senal, logica de control y telemetria en red.
+              </li>
+              <li>
+                <span>2024 - 2025</span>
+                Integraciones con PLC y mapeo Modbus TCP para pruebas y operacion en entorno real.
+              </li>
+              <li>
+                <span>2023 - 2024</span>
+                Dashboards con Flask y pipelines de datos para monitoreo de estados de maquina.
+              </li>
+              <li>
+                <span>2022 - 2023</span>
+                Material tecnico y practicas para electronica, programacion y automatizacion.
+              </li>
+            </ul>
+          </article>
+
+          <article class="card tile reveal">
+            <h2>Fortalezas</h2>
+            <ul class="timeline">
+              <li>
+                <span>Arquitectura completa</span>
+                De firmware a frontend con enfoque en mantenibilidad y diagnostico rapido.
+              </li>
+              <li>
+                <span>Comunicacion industrial</span>
+                Eleccion y validacion de protocolos segun alcance, latencia y ruido del entorno.
+              </li>
+              <li>
+                <span>Implementacion pragmatica</span>
+                Soluciones que se pueden desplegar y operar por equipos no especializados.
+              </li>
+              <li>
+                <span>Transferencia tecnica</span>
+                Documentacion y explicacion clara para adopcion en equipos mixtos.
+              </li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel" id="proyectos">
+        <article class="card tile reveal">
+          <h2>Proyectos Destacados</h2>
+          <div class="projects-shell">
+            <aside class="project-index">
+              <button class="project-link active" type="button" data-project-link="rp2040">
+                <span class="project-link-title">Tarjeta RP2040</span>
+                <span class="project-link-sub">Adquisicion industrial</span>
+              </button>
+              <button class="project-link" type="button" data-project-link="esp32">
+                <span class="project-link-title">Nodo IoT ESP32</span>
+                <span class="project-link-sub">MQTT + telemetria</span>
+              </button>
+              <button class="project-link" type="button" data-project-link="rpi">
+                <span class="project-link-title">Monitor Raspberry Pi</span>
+                <span class="project-link-sub">Dashboard de planta</span>
+              </button>
+              <button class="project-link" type="button" data-project-link="opencv">
+                <span class="project-link-title">Vision por computadora</span>
+                <span class="project-link-sub">OpenCV aplicado</span>
+              </button>
+            </aside>
+
+            <section class="project-display" aria-live="polite">
+              <article class="project-view active" data-project-view="rp2040">
+                <h3 class="project-headline">Tarjeta de adquisicion RP2040</h3>
+                <p class="project-meta">Hardware + firmware + Modbus TCP</p>
+                <div class="project-media">
+                  <div class="project-media-track">
+                    <div class="project-media-frame">Imagen del proyecto (proximamente)</div>
+                  </div>
+                </div>
+                <p class="project-desc">Hardware + firmware para 0-10V, 4-20mA, entradas digitales y salidas de control con exposicion Modbus TCP.</p>
+              </article>
+
+              <article class="project-view" data-project-view="esp32">
+                <h3 class="project-headline">Nodo IoT con ESP32 + MQTT</h3>
+                <p class="project-meta">Comunicacion resiliente y segura</p>
+                <div class="project-media">
+                  <div class="project-media-track">
+                    <div class="project-media-frame">Imagen del proyecto (proximamente)</div>
+                  </div>
+                </div>
+                <p class="project-desc">Publicacion segura de telemetria y alarmas, con reconexion automatica y buffering local.</p>
+              </article>
+
+              <article class="project-view" data-project-view="rpi">
+                <h3 class="project-headline">Monitor industrial en Raspberry Pi</h3>
+                <p class="project-meta">Flask + API + visualizacion</p>
+                <div class="project-media">
+                  <div class="project-media-track">
+                    <div class="project-media-frame">Imagen del proyecto (proximamente)</div>
+                  </div>
+                </div>
+                <p class="project-desc">Servicio de adquisicion serial, API en Flask y tablero web para OEE, eventos y rendimiento.</p>
+              </article>
+
+              <article class="project-view" data-project-view="opencv">
+                <h3 class="project-headline">Vision por computadora aplicada</h3>
+                <p class="project-meta">Deteccion y tracking de piezas</p>
+                <div class="project-media">
+                  <div class="project-media-track">
+                    <div class="project-media-frame">Imagen del proyecto (proximamente)</div>
+                  </div>
+                </div>
+                <p class="project-desc">OpenCV para deteccion y tracking de piezas en linea, con salida de datos para control estadistico.</p>
+              </article>
+            </section>
+          </div>
+        </article>
+      </section>
+
+      <section class="panel" id="contacto">
+        <div class="panel-grid">
+          <article class="card tile reveal">
+            <h2>Contacto</h2>
+            <p>Si quieres cotizar, colaborar o armar una solucion para planta/laboratorio, escribeme por cualquiera de estos canales.</p>
+          </article>
+          <article class="card tile reveal contact-card">
+            <a class="contact-link" href="mailto:juanramirezupav@gmail.com">juanramirezupav@gmail.com</a>
+            <a class="contact-link" href="tel:+522282690516">+52 228 269 0516</a>
+            <a class="contact-link" href="https://www.linkedin.com/in/carlos-hernandez-a79a6b248" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+            <a class="contact-link" href="https://github.com/Carlos-Hernandez-Q" target="_blank" rel="noopener noreferrer">GitHub</a>
+          </article>
+        </div>
+      </section>
     </section>
   </main>
+
+  <script>
+    const navButtons = document.querySelectorAll('.nav-btn');
+    const panels = document.querySelectorAll('.panel');
+    const revealEls = document.querySelectorAll('.reveal');
+    const bars = document.querySelectorAll('.bar span');
+    const counters = document.querySelectorAll('[data-count]');
+    const projectLinks = document.querySelectorAll('[data-project-link]');
+    const projectViews = document.querySelectorAll('[data-project-view]');
+
+    function panelIsVisible(id) {
+      const panel = document.getElementById(id);
+      return panel && panel.classList.contains('active');
+    }
+
+    function animateBarsIfNeeded() {
+      if (!panelIsVisible('perfil')) return;
+      bars.forEach((bar) => {
+        bar.style.width = bar.dataset.width || '0%';
+      });
+    }
+
+    function activateTab(tabId) {
+      navButtons.forEach((btn) => btn.classList.toggle('active', btn.dataset.tab === tabId));
+      panels.forEach((panel) => panel.classList.toggle('active', panel.id === tabId));
+      animateBarsIfNeeded();
+      syncHero(tabId);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function syncHero(tabId) {
+      const hero = document.querySelector('.hero');
+      if (!hero) return;
+      hero.classList.toggle('collapsed', tabId !== 'perfil');
+    }
+
+    navButtons.forEach((btn) => {
+      btn.addEventListener('click', (event) => {
+        const ripple = document.createElement('span');
+        ripple.className = 'ripple';
+        const rect = btn.getBoundingClientRect();
+        ripple.style.left = `${event.clientX - rect.left}px`;
+        ripple.style.top = `${event.clientY - rect.top}px`;
+        btn.appendChild(ripple);
+        ripple.addEventListener('animationend', () => ripple.remove());
+
+        activateTab(btn.dataset.tab);
+      });
+    });
+
+    function activateProject(projectId) {
+      projectLinks.forEach((link) => {
+        link.classList.toggle('active', link.dataset.projectLink === projectId);
+      });
+
+      projectViews.forEach((view) => {
+        const isActive = view.dataset.projectView === projectId;
+        view.classList.toggle('active', isActive);
+      });
+    }
+
+    projectLinks.forEach((link) => {
+      link.addEventListener('click', () => {
+        activateProject(link.dataset.projectLink);
+      });
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('show');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.14 });
+
+    revealEls.forEach((el) => observer.observe(el));
+
+    const statsObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+
+        const el = entry.target;
+        const target = Number(el.dataset.count || 0);
+        const duration = 900;
+        const start = performance.now();
+
+        function tick(now) {
+          const progress = Math.min((now - start) / duration, 1);
+          const value = Math.floor(progress * target);
+          el.textContent = String(value);
+          if (progress < 1) {
+            requestAnimationFrame(tick);
+          } else {
+            el.textContent = String(target);
+          }
+        }
+
+        requestAnimationFrame(tick);
+        statsObserver.unobserve(el);
+      });
+    }, { threshold: 0.8 });
+
+    counters.forEach((counter) => statsObserver.observe(counter));
+
+    animateBarsIfNeeded();
+    syncHero('perfil');
+    activateProject('rp2040');
+
+    const aurora = document.getElementById('aurora');
+    window.addEventListener('pointermove', (event) => {
+      const x = (event.clientX / window.innerWidth - 0.5) * 16;
+      const y = (event.clientY / window.innerHeight - 0.5) * 16;
+      aurora.style.setProperty('--mx', `${x}px`);
+      aurora.style.setProperty('--my', `${y}px`);
+    });
+
+  </script>
 </body>
 </html>
